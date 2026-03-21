@@ -4,8 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>⚓ Penguins · Summer 2026</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚓</text></svg>" />
+  <title>Penguins - Summer 2026</title>
   <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { background: #0b1a27; }</style>
 </head>
 <body>
@@ -156,7 +155,7 @@ function dowFull(ds) { return [“Sunday”,“Monday”,“Tuesday”,“Wednes
 
 function buildInitial() {
 const out = {};
-ALL_DAYS.forEach(d => { out[d] = { …(INITIAL[d] || {}) }; });
+ALL_DAYS.forEach(d => { out[d] = Object.assign({}, INITIAL[d] || {}); });
 return out;
 }
 
@@ -216,7 +215,7 @@ async function load() {
 const init = buildInitial();
 try {
 const remote = await fbGet();
-setData(remote && Object.keys(remote).length > 0 ? { …init, …remote } : init);
+setData(remote && Object.keys(remote).length > 0 ? Object.assign({}, init, remote) : init);
 } catch { setData(init); }
 }
 load();
@@ -224,7 +223,7 @@ const interval = setInterval(async () => {
 try {
 const remote = await fbGet();
 if (remote && Object.keys(remote).length > 0)
-setData(() => ({ …buildInitial(), …remote }));
+setData(() => (Object.assign({}, buildInitial(), remote)));
 } catch {}
 }, 30000);
 return () => clearInterval(interval);
@@ -242,9 +241,9 @@ setSaving(false);
 function toggleMonth(m) {
 setVisibleMonths(prev => { const n = new Set(prev); n.has(m) ? n.delete(m) : n.add(m); return n; });
 }
-function openEdit(ds) { setDraft({ …(data[ds] || {}) }); setEditing(ds); }
-function saveEdit() { const nd = { …data, [editing]: { …draft } }; setData(nd); persist(nd); setEditing(null); }
-function clearDay() { const nd = { …data, [editing]: {} }; setData(nd); persist(nd); setEditing(null); }
+function openEdit(ds) { setDraft(Object.assign({}, data[ds] || {})); setEditing(ds); }
+function saveEdit() { const nd = Object.assign({}, data, {[editing]: Object.assign({}, draft)}); setData(nd); persist(nd); setEditing(null); }
+function clearDay() { const nd = Object.assign({}, data, {[editing]: {}}); setData(nd); persist(nd); setEditing(null); }
 
 if (!data) return (
 <div style={{ display:“flex”, flexDirection:“column”, alignItems:“center”, justifyContent:“center”, height:“100vh”, background:”#0b1a27”, fontFamily:“Georgia,serif”, color:”#F5D98E”, gap:12 }}>
@@ -265,10 +264,10 @@ if (idx >= 0) monthBoundaries.push({ month: m, idx });
 
 // Fixed rows: always Fede, Ale, Mamy, Babu, then boat location, boat use
 const rows = [
-…PEOPLE.map(p => ({ key: p, label: p, field: p, color: COLORS[p] })),
+PEOPLE.map(p => ({ key: p, label: p, field: p, color: COLORS[p] })).concat([
 { key: “boat_location”, label: “🚢 Location”, field: “boat_location”, color: BOAT_LOC_BG },
 { key: “boat_use”,      label: “🚢 Use”,       field: “boat_use”,      color: BOAT_USE_BG },
-];
+]);
 
 function TrackBackground() {
 return <>
@@ -477,7 +476,7 @@ return (
                 <label style={{ width:38, fontSize:12, color:COLORS[p], fontWeight:700 }}>{p}</label>
                 <input
                   value={draft[p] || ""}
-                  onChange={e => setDraft(v => ({ ...v, [p]: e.target.value }))}
+                  onChange={e => setDraft(v => Object.assign({}, v, {[p]: e.target.value}))}
                   placeholder={`What is ${p} doing?`}
                   style={{ flex:1, border:`1.5px solid ${COLORS[p]}`, borderRadius:6, padding:"5px 8px", fontSize:12, background:"rgba(255,255,255,0.04)", color:"#fff", fontFamily:"Georgia,serif", outline:"none" }}
                 />
@@ -496,7 +495,7 @@ return (
                 <label style={{ width:50, fontSize:12, color:col, fontWeight:700 }}>{label}</label>
                 <input
                   value={draft[key] || ""}
-                  onChange={e => setDraft(v => ({ ...v, [key]: e.target.value }))}
+                  onChange={e => setDraft(v => Object.assign({}, v, {[key]: e.target.value}))}
                   placeholder={ph}
                   style={{ flex:1, border:`1.5px solid ${col}`, borderRadius:6, padding:"5px 8px", fontSize:12, background:"rgba(255,255,255,0.04)", color:"#fff", fontFamily:"Georgia,serif", outline:"none" }}
                 />
