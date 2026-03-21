@@ -2,523 +2,416 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Penguins - Summer 2026</title>
-  <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { background: #0b1a27; }</style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Penguins - Summer 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b1a27;font-family:Georgia,serif;color:#fff;min-height:100vh}
+#header{background:linear-gradient(135deg,#1a3a4a,#0d2333);padding:16px 20px;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,0.5)}
+.subtitle{color:#F5D98E;font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:2px}
+.title{color:#fff;font-size:20px}
+#month-toggles{display:flex;gap:5px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.month-label{color:rgba(255,255,255,0.35);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-right:6px}
+.mbtn{padding:4px 13px;border-radius:16px;cursor:pointer;font-family:Georgia,serif;font-size:12px;border:2px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.35);transition:all 0.15s}
+.mbtn.active{border-color:#F5D98E;background:#F5D98E;color:#0d2333;font-weight:700}
+#saving{color:#F5D98E;font-size:11px;display:none;margin-left:auto}
+#timeline-wrap{max-width:1300px;margin:0 auto;padding:24px 0 60px}
+#timeline-scroll{overflow-x:auto;padding-bottom:12px}
+#timeline{position:relative;display:inline-flex;flex-direction:column}
+.month-header-row{display:flex;margin-left:90px}
+.month-label-cell{flex-shrink:0;padding:4px 0 3px 8px;font-size:11px;font-weight:700;color:#F5D98E;letter-spacing:2px;text-transform:uppercase;border-left:2px solid rgba(245,217,142,0.3)}
+.day-header-row{display:flex;margin-left:90px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:4px;margin-bottom:8px}
+.day-cell{width:34px;flex-shrink:0;text-align:center;cursor:pointer;padding-top:3px}
+.day-cell.month-start{border-left:2px solid rgba(245,217,142,0.3)}
+.dow-label{font-size:8px;color:rgba(255,255,255,0.22);margin-bottom:1px}
+.day-num{font-size:10px;color:rgba(255,255,255,0.4);line-height:17px;border-radius:3px}
+.day-cell.weekend .day-num{color:#F5D98E;font-weight:700;background:rgba(245,217,142,0.1)}
+.row-wrap{display:flex;align-items:center;margin-bottom:3px;height:34px}
+.row-label{width:90px;flex-shrink:0;padding-right:10px;text-align:right;font-size:12px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;position:sticky;left:0;z-index:10;background:#0b1a27;height:34px;display:flex;align-items:center;justify-content:flex-end}
+.track{position:relative;height:34px;flex-shrink:0}
+.block{position:absolute;top:3px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.3);pointer-events:none}
+.block span{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92%;text-align:center;letter-spacing:0.3px}
+.click-zone{position:absolute;top:0;height:100%;cursor:pointer;z-index:2;width:34px}
+.weekend-shade{position:absolute;top:0;width:34px;height:100%;background:rgba(245,217,142,0.04);pointer-events:none}
+.month-divider{position:absolute;top:0;width:2px;height:100%;background:rgba(245,217,142,0.15);pointer-events:none}
+.boat-divider{display:flex;align-items:center;margin:10px 0}
+.boat-divider-label{width:90px;flex-shrink:0;position:sticky;left:0;background:#0b1a27;z-index:10}
+.boat-divider-line{flex:1;height:1px;background:rgba(0,172,193,0.2)}
+.bottom-ruler{display:flex;margin-top:8px;border-top:1px solid rgba(255,255,255,0.05)}
+.bottom-ruler-spacer{width:90px;flex-shrink:0;position:sticky;left:0;background:#0b1a27;z-index:10}
+.ruler-day{width:34px;flex-shrink:0;text-align:center;padding-top:4px;font-size:8px;color:rgba(255,255,255,0.12)}
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:200;align-items:center;justify-content:center;padding:16px}
+#modal-overlay.open{display:flex}
+#modal{background:#132534;border-radius:14px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.6);overflow:hidden;border:1px solid rgba(245,217,142,0.12)}
+#modal-header{background:linear-gradient(135deg,#1a3a4a,#0d2333);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+#modal-date{color:#F5D98E;font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px}
+#modal-title{color:#fff;font-size:15px}
+#modal-close{background:rgba(255,255,255,0.08);border:none;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:16px}
+#modal-body{padding:14px 20px}
+.section-label{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px}
+.field-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.field-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.field-label{width:50px;font-size:12px;font-weight:700}
+.field-input{flex:1;border-radius:6px;padding:5px 8px;font-size:12px;background:rgba(255,255,255,0.04);color:#fff;font-family:Georgia,serif;outline:none}
+#modal-buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn-clear,.btn-cancel{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:Georgia,serif}
+.btn-save{padding:6px 16px;border-radius:6px;border:none;background:linear-gradient(135deg,#F5D98E,#E6C84A);color:#0d2333;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-  <script type="text/babel">
-const { useState, useEffect, useRef } = React;
 
-const PEOPLE = [“Fede”, “Ale”, “Mamy”, “Babu”];
-const COLORS = {
-Fede: “#FF9800”,
-Ale:  “#1E88E5”,
-Mamy: “#E91E63”,
-Babu: “#43A047”,
-};
-const BOAT_LOC_BG = “#00ACC1”;
-const BOAT_USE_BG = “#00838F”;
+<div id="header">
+  <div style="max-width:1300px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="subtitle">Penguins · Summer 2026</div>
+        <div class="title">Family Summer Planner</div>
+      </div>
+      <div id="saving">Saving…</div>
+    </div>
+    <div id="month-toggles">
+      <span class="month-label">Months</span>
+    </div>
+  </div>
+</div>
 
-// Activity colours — same activity = same colour for everyone
+<div id="timeline-wrap">
+  <div id="timeline-scroll">
+    <div id="timeline"></div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal">
+    <div id="modal-header">
+      <div>
+        <div id="modal-date"></div>
+        <div id="modal-title">Edit Day</div>
+      </div>
+      <button id="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body">
+      <div class="section-label">Family</div>
+      <div id="people-fields"></div>
+      <div class="section-label" style="margin-top:14px">🚢 Penguins</div>
+      <div id="boat-fields"></div>
+      <div id="modal-buttons">
+        <button class="btn-clear" onclick="clearDay()">Clear</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveDay()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FIREBASE_URL = "https://summer-2026-eed9c-default-rtdb.firebaseio.com";
+const PEOPLE = ["Fede","Ale","Mamy","Babu"];
+const COLORS = {Fede:"#FF9800",Ale:"#1E88E5",Mamy:"#E91E63",Babu:"#43A047"};
 const ACTIVITY_COLORS = {
-“WIMBLEDON”:                    “#2E7D32”, // dark green
-“NADAL CAMP”:                   “#C62828”, // red
-“VOLLEY CAMP”:                  “#F9A825”, // amber/yellow
-“SYDNEY?”:                      “#E91E8C”, // pink
-“GREECE”:                       “#EF6C00”, // orange (Fede solo)
-“PENGUINS CANNES”:              “#29B6F6”, // light blue — on boat
-“PENGUINS CANNES?”:             “#29B6F6”,
-“PENGUINS GREECE with Ricky”:   “#039BE5”, // slightly deeper light blue
-“PENGUINS GREECE with cousins”: “#0288D1”, // deeper still
-“RENTED”:                       “#757575”, // grey — rented out
-“FORMENTI”:                     “#29B6F6”, // light blue — family using it
-“SAN LORENZO”:                  “#757575”, // grey — rented to San Lorenzo
-“CANNES”:                       “#1565C0”, // blue (boat location)
-“TRANSFER”:                     “#546E7A”, // blue-grey
+  "WIMBLEDON":"#2E7D32","NADAL CAMP":"#C62828","VOLLEY CAMP":"#F9A825",
+  "SYDNEY?":"#E91E8C","GREECE":"#EF6C00",
+  "PENGUINS CANNES":"#29B6F6","PENGUINS CANNES?":"#29B6F6",
+  "PENGUINS GREECE with Ricky":"#039BE5","PENGUINS GREECE with cousins":"#0288D1",
+  "RENTED":"#757575","FORMENTI":"#29B6F6","SAN LORENZO":"#757575",
+  "CANNES":"#1565C0","TRANSFER":"#546E7A"
 };
+const ALL_MONTHS = ["April","May","June","July","August","September"];
+const COL_W = 34, LABEL_W = 90, ROW_H = 34;
+const DAYS_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const DAYS_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September"];
 
-function activityColor(value, field) {
-if (field === “boat_location” && value === “GREECE”) return “#1976D2”;
-return ACTIVITY_COLORS[value] || “#455A64”;
+const INITIAL = {"2026-06-01":{boat_location:"CANNES"},"2026-06-02":{boat_location:"CANNES"},"2026-06-03":{boat_location:"CANNES"},"2026-06-04":{boat_location:"CANNES"},"2026-06-05":{boat_location:"CANNES"},"2026-06-06":{boat_location:"CANNES"},"2026-06-07":{boat_location:"CANNES"},"2026-06-08":{boat_location:"CANNES"},"2026-06-09":{boat_location:"CANNES"},"2026-06-10":{boat_location:"CANNES"},"2026-06-11":{boat_location:"CANNES"},"2026-06-12":{boat_location:"CANNES"},"2026-06-13":{boat_location:"CANNES"},"2026-06-14":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-15":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-16":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-17":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-18":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-19":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-20":{Fede:"NADAL CAMP",boat_location:"CANNES",boat_use:"SAN LORENZO"},"2026-06-21":{Fede:"NADAL CAMP",boat_location:"CANNES"},"2026-06-22":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-23":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-24":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-25":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-26":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-27":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",Mamy:"SYDNEY?",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-28":{Fede:"NADAL CAMP",Ale:"VOLLEY CAMP",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-29":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-06-30":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-01":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-02":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-03":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-04":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-05":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-06":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-07":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-08":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-09":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-10":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-11":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-12":{Fede:"WIMBLEDON",Ale:"WIMBLEDON",Mamy:"WIMBLEDON",Babu:"WIMBLEDON",boat_location:"CANNES"},"2026-07-13":{Fede:"PENGUINS CANNES?",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-14":{Fede:"PENGUINS CANNES?",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-15":{Fede:"PENGUINS CANNES?",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-16":{Fede:"GREECE",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-17":{Fede:"GREECE",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-18":{Fede:"GREECE",Ale:"PENGUINS CANNES",Mamy:"PENGUINS CANNES",Babu:"PENGUINS CANNES",boat_location:"CANNES",boat_use:"FORMENTI"},"2026-07-19":{Fede:"GREECE",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-20":{Fede:"GREECE",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-21":{Fede:"GREECE",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-22":{Fede:"GREECE",boat_location:"CANNES",boat_use:"RENTED"},"2026-07-23":{boat_location:"CANNES",boat_use:"RENTED"},"2026-07-24":{boat_location:"CANNES",boat_use:"RENTED"},"2026-07-25":{boat_location:"CANNES",boat_use:"RENTED"},"2026-07-26":{boat_location:"CANNES",boat_use:"RENTED"},"2026-07-27":{boat_location:"TRANSFER"},"2026-07-28":{boat_location:"TRANSFER"},"2026-07-29":{boat_location:"TRANSFER"},"2026-07-30":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-07-31":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-01":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-02":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-03":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-04":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-05":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-06":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-07":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-08":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-09":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-10":{Fede:"PENGUINS GREECE with Ricky",Ale:"PENGUINS GREECE with Ricky",Mamy:"PENGUINS GREECE with Ricky",Babu:"PENGUINS GREECE with Ricky",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-11":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-12":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-13":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-14":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-15":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-16":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-17":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-18":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-19":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-20":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-21":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-22":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"},"2026-08-23":{Fede:"PENGUINS GREECE with cousins",Ale:"PENGUINS GREECE with cousins",Mamy:"PENGUINS GREECE with cousins",Babu:"PENGUINS GREECE with cousins",boat_location:"GREECE",boat_use:"FORMENTI"}};
+
+function genDays(){
+  var days=[];
+  var d=new Date("2026-04-01");
+  var end=new Date("2026-09-06");
+  while(d<end){days.push(d.toISOString().slice(0,10));d.setDate(d.getDate()+1);}
+  return days;
+}
+var ALL_DAYS=genDays();
+
+function monthOf(ds){return MONTHS_FULL[parseInt(ds.slice(5,7))-1];}
+function dowOf(ds){return new Date(ds+"T12:00:00").getDay();}
+function isWeekend(ds){var d=dowOf(ds);return d===0||d===6;}
+function dayN(ds){return parseInt(ds.slice(8));}
+
+function buildInitial(){
+  var out={};
+  ALL_DAYS.forEach(function(d){out[d]=Object.assign({},INITIAL[d]||{});});
+  return out;
 }
 
-const INITIAL = {
-“2026-06-01”: { boat_location: “CANNES” },
-“2026-06-02”: { boat_location: “CANNES” },
-“2026-06-03”: { boat_location: “CANNES” },
-“2026-06-04”: { boat_location: “CANNES” },
-“2026-06-05”: { boat_location: “CANNES” },
-“2026-06-06”: { boat_location: “CANNES” },
-“2026-06-07”: { boat_location: “CANNES” },
-“2026-06-08”: { boat_location: “CANNES” },
-“2026-06-09”: { boat_location: “CANNES” },
-“2026-06-10”: { boat_location: “CANNES” },
-“2026-06-11”: { boat_location: “CANNES” },
-“2026-06-12”: { boat_location: “CANNES” },
-“2026-06-13”: { boat_location: “CANNES” },
-“2026-06-14”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-15”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-16”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-17”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-18”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-19”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-20”: { Fede: “NADAL CAMP”, boat_location: “CANNES”, boat_use: “SAN LORENZO” },
-“2026-06-21”: { Fede: “NADAL CAMP”, boat_location: “CANNES” },
-“2026-06-22”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-23”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-24”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-25”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-26”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-27”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, Mamy: “SYDNEY?”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-28”: { Fede: “NADAL CAMP”, Ale: “VOLLEY CAMP”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-29”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-06-30”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-01”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-02”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-03”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-04”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-05”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-06”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-07”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-08”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-09”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-10”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-11”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-12”: { Fede: “WIMBLEDON”, Ale: “WIMBLEDON”, Mamy: “WIMBLEDON”, Babu: “WIMBLEDON”, boat_location: “CANNES” },
-“2026-07-13”: { Fede: “PENGUINS CANNES?”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-14”: { Fede: “PENGUINS CANNES?”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-15”: { Fede: “PENGUINS CANNES?”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-16”: { Fede: “GREECE”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-17”: { Fede: “GREECE”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-18”: { Fede: “GREECE”, Ale: “PENGUINS CANNES”, Mamy: “PENGUINS CANNES”, Babu: “PENGUINS CANNES”, boat_location: “CANNES”, boat_use: “FORMENTI” },
-“2026-07-19”: { Fede: “GREECE”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-20”: { Fede: “GREECE”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-21”: { Fede: “GREECE”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-22”: { Fede: “GREECE”, boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-23”: { boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-24”: { boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-25”: { boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-26”: { boat_location: “CANNES”, boat_use: “RENTED” },
-“2026-07-27”: { boat_location: “TRANSFER” },
-“2026-07-28”: { boat_location: “TRANSFER” },
-“2026-07-29”: { boat_location: “TRANSFER” },
-“2026-07-30”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-07-31”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-01”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-02”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-03”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-04”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-05”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-06”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-07”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-08”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-09”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-10”: { Fede: “PENGUINS GREECE with Ricky”, Ale: “PENGUINS GREECE with Ricky”, Mamy: “PENGUINS GREECE with Ricky”, Babu: “PENGUINS GREECE with Ricky”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-11”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-12”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-13”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-14”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-15”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-16”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-17”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-18”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-19”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-20”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-21”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-22”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-“2026-08-23”: { Fede: “PENGUINS GREECE with cousins”, Ale: “PENGUINS GREECE with cousins”, Mamy: “PENGUINS GREECE with cousins”, Babu: “PENGUINS GREECE with cousins”, boat_location: “GREECE”, boat_use: “FORMENTI” },
-};
-
-function generateDays() {
-const days = [];
-for (let d = new Date(“2026-04-01”); d <= new Date(“2026-09-05”); d.setDate(d.getDate() + 1))
-days.push(d.toISOString().slice(0, 10));
-return days;
-}
-const ALL_DAYS = generateDays();
-const ALL_MONTHS = [“April”, “May”, “June”, “July”, “August”, “September”];
-function monthOf(ds) {
-const m = parseInt(ds.slice(5,7));
-return [””,””,””,””,“April”,“May”,“June”,“July”,“August”,“September”][m];
-}
-function dow(ds) { return new Date(ds + “T12:00:00”).getDay(); }
-function isWeekend(ds) { const d = dow(ds); return d === 0 || d === 6; }
-function dayN(ds) { return parseInt(ds.slice(8)); }
-function dowShort(ds) { return [“Su”,“Mo”,“Tu”,“We”,“Th”,“Fr”,“Sa”][dow(ds)]; }
-function dowFull(ds) { return [“Sunday”,“Monday”,“Tuesday”,“Wednesday”,“Thursday”,“Friday”,“Saturday”][dow(ds)]; }
-
-function buildInitial() {
-const out = {};
-ALL_DAYS.forEach(d => { out[d] = Object.assign({}, INITIAL[d] || {}); });
-return out;
+function actColor(val,field){
+  if(field==="boat_location"&&val==="GREECE")return"#1976D2";
+  return ACTIVITY_COLORS[val]||"#455A64";
 }
 
-// Simple contiguous block finder for one field across a list of days
-function getBlocks(days, getValue) {
-const blocks = [];
-let i = 0;
-while (i < days.length) {
-const val = getValue(days[i]);
-if (!val) { i++; continue; }
-let j = i + 1;
-while (j < days.length && getValue(days[j]) === val) j++;
-blocks.push({ startIdx: i, endIdx: j - 1, value: val });
-i = j;
+var DATA={};
+var visibleMonths=new Set(ALL_MONTHS);
+var editingDay=null;
+var saveTimer=null;
+
+async function fbGet(){
+  try{
+    var r=await fetch(FIREBASE_URL+"/data.json");
+    if(!r.ok)return null;
+    return r.json();
+  }catch(e){return null;}
 }
-return blocks;
+async function fbSet(d){
+  try{
+    await fetch(FIREBASE_URL+"/data.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});
+  }catch(e){}
 }
 
-const COL_W = 34;
-const LABEL_W = 90;
-const ROW_H = 34;
-const ROW_GAP = 3;
-
-// ── Firebase Realtime Database ───────────────────────────────────────────────
-// Free shared storage — all family members read/write the same calendar.
-// Setup (5 min, one time):
-//   1. Go to console.firebase.google.com → Add project → “summer-2026” → Create
-//   2. Left sidebar → Build → Realtime Database → Create database → Test mode → Enable
-//   3. Copy the URL shown (looks like https://summer-2026-default-rtdb.firebaseio.com)
-//   4. Paste it below replacing the placeholder
-const FIREBASE_URL = “https://summer-2026-eed9c-default-rtdb.firebaseio.com”;
-
-async function fbGet() {
-const res = await fetch(FIREBASE_URL + “/data.json”);
-if (!res.ok) return null;
-return res.json();
+async function init(){
+  DATA=buildInitial();
+  var remote=await fbGet();
+  if(remote&&Object.keys(remote).length>0){
+    Object.keys(remote).forEach(function(k){DATA[k]=remote[k];});
+  }
+  render();
+  setInterval(async function(){
+    var r=await fbGet();
+    if(r&&Object.keys(r).length>0){
+      var base=buildInitial();
+      Object.keys(r).forEach(function(k){base[k]=r[k];});
+      DATA=base;
+      render();
+    }
+  },30000);
 }
-async function fbSet(data) {
-await fetch(FIREBASE_URL + “/data.json”, {
-method: “PUT”,
-headers: { “Content-Type”: “application/json” },
-body: JSON.stringify(data),
+
+function persist(){
+  document.getElementById("saving").style.display="block";
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async function(){
+    await fbSet(DATA);
+    document.getElementById("saving").style.display="none";
+  },800);
+}
+
+function getBlocks(days,field){
+  var blocks=[];
+  var i=0;
+  while(i<days.length){
+    var val=(DATA[days[i]]||{})[field]||null;
+    if(!val){i++;continue;}
+    var j=i+1;
+    while(j<days.length&&((DATA[days[j]]||{})[field]||null)===val)j++;
+    blocks.push({startIdx:i,endIdx:j-1,value:val});
+    i=j;
+  }
+  return blocks;
+}
+
+function render(){
+  var visibleDays=ALL_DAYS.filter(function(d){return visibleMonths.has(monthOf(d));});
+  var totalW=visibleDays.length*COL_W;
+
+  // Month toggles
+  var mt=document.getElementById("month-toggles");
+  mt.innerHTML='<span class="month-label">Months</span>';
+  ALL_MONTHS.forEach(function(m){
+    var b=document.createElement("button");
+    b.className="mbtn"+(visibleMonths.has(m)?" active":"");
+    b.textContent=m;
+    b.onclick=function(){
+      if(visibleMonths.has(m))visibleMonths.delete(m);else visibleMonths.add(m);
+      render();
+    };
+    mt.appendChild(b);
+  });
+
+  var tl=document.getElementById("timeline");
+  tl.innerHTML="";
+
+  // Month boundaries
+  var boundaries=[];
+  ALL_MONTHS.forEach(function(m){
+    if(!visibleMonths.has(m))return;
+    var idx=visibleDays.findIndex(function(d){return monthOf(d)===m;});
+    if(idx>=0)boundaries.push({month:m,idx:idx});
+  });
+
+  // Month header row
+  var mhr=document.createElement("div");
+  mhr.className="month-header-row";
+  boundaries.forEach(function(b,i){
+    var nextIdx=i+1<boundaries.length?boundaries[i+1].idx:visibleDays.length;
+    var cell=document.createElement("div");
+    cell.className="month-label-cell";
+    cell.style.width=((nextIdx-b.idx)*COL_W)+"px";
+    cell.textContent=b.month;
+    mhr.appendChild(cell);
+  });
+  tl.appendChild(mhr);
+
+  // Day header row
+  var dhr=document.createElement("div");
+  dhr.className="day-header-row";
+  visibleDays.forEach(function(ds){
+    var cell=document.createElement("div");
+    cell.className="day-cell"+(isWeekend(ds)?" weekend":"")+(dayN(ds)===1?" month-start":"");
+    cell.innerHTML='<div class="dow-label">'+DAYS_SHORT[dowOf(ds)]+'</div><div class="day-num">'+dayN(ds)+'</div>';
+    cell.onclick=function(){openModal(ds);};
+    dhr.appendChild(cell);
+  });
+  tl.appendChild(dhr);
+
+  // Rows
+  var rows=PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};});
+  rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
+  rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
+
+  rows.forEach(function(row,ri){
+    if(ri===PEOPLE.length){
+      var div=document.createElement("div");
+      div.className="boat-divider";
+      div.innerHTML='<div class="boat-divider-label"></div><div class="boat-divider-line"></div>';
+      tl.appendChild(div);
+    }
+    var wrap=document.createElement("div");
+    wrap.className="row-wrap";
+
+    var label=document.createElement("div");
+    label.className="row-label";
+    label.style.color=row.color;
+    label.textContent=row.label;
+    wrap.appendChild(label);
+
+    var track=document.createElement("div");
+    track.className="track";
+    track.style.width=totalW+"px";
+
+    // Weekend shading
+    visibleDays.forEach(function(ds,i){
+      if(isWeekend(ds)){
+        var s=document.createElement("div");
+        s.className="weekend-shade";
+        s.style.left=(i*COL_W)+"px";
+        track.appendChild(s);
+      }
+    });
+
+    // Month dividers
+    boundaries.slice(1).forEach(function(b){
+      var d=document.createElement("div");
+      d.className="month-divider";
+      d.style.left=(b.idx*COL_W)+"px";
+      track.appendChild(d);
+    });
+
+    // Blocks
+    getBlocks(visibleDays,row.field).forEach(function(block){
+      var x=block.startIdx*COL_W;
+      var w=(block.endIdx-block.startIdx+1)*COL_W;
+      var el=document.createElement("div");
+      el.className="block";
+      el.style.left=(x+2)+"px";
+      el.style.width=(w-4)+"px";
+      el.style.background=actColor(block.value,row.field);
+      el.innerHTML='<span>'+block.value+'</span>';
+      track.appendChild(el);
+    });
+
+    // Click zones
+    visibleDays.forEach(function(ds,i){
+      var z=document.createElement("div");
+      z.className="click-zone";
+      z.style.left=(i*COL_W)+"px";
+      z.onclick=function(){openModal(ds);};
+      track.appendChild(z);
+    });
+
+    wrap.appendChild(track);
+    tl.appendChild(wrap);
+  });
+
+  // Bottom ruler
+  var ruler=document.createElement("div");
+  ruler.className="bottom-ruler";
+  var spacer=document.createElement("div");
+  spacer.className="bottom-ruler-spacer";
+  ruler.appendChild(spacer);
+  visibleDays.forEach(function(ds){
+    var cell=document.createElement("div");
+    cell.className="ruler-day";
+    cell.textContent=dayN(ds);
+    ruler.appendChild(cell);
+  });
+  tl.appendChild(ruler);
+}
+
+function openModal(ds){
+  editingDay=ds;
+  var d=new Date(ds+"T12:00:00");
+  document.getElementById("modal-date").textContent=DAYS_FULL[d.getDay()]+", "+MONTHS_FULL[d.getMonth()]+" "+d.getDate();
+  var dayData=DATA[ds]||{};
+
+  var pf=document.getElementById("people-fields");
+  pf.innerHTML="";
+  PEOPLE.forEach(function(p){
+    var row=document.createElement("div");
+    row.className="field-row";
+    row.innerHTML='<div class="field-dot" style="background:'+COLORS[p]+'"></div>'
+      +'<div class="field-label" style="color:'+COLORS[p]+'">'+p+'</div>'
+      +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" placeholder="What is '+p+' doing?" value="'+(dayData[p]||'')+'">';
+    pf.appendChild(row);
+  });
+
+  var bf=document.getElementById("boat-fields");
+  bf.innerHTML='<div class="field-row">'
+    +'<span style="font-size:12px">📍</span>'
+    +'<div class="field-label" style="color:#00ACC1">Location</div>'
+    +'<input class="field-input" id="field-boat_location" style="border:1.5px solid #00ACC1" placeholder="Where is the boat?" value="'+(dayData.boat_location||'')+'"></div>'
+    +'<div class="field-row">'
+    +'<span style="font-size:12px">👥</span>'
+    +'<div class="field-label" style="color:#00838F">Using it</div>'
+    +'<input class="field-input" id="field-boat_use" style="border:1.5px solid #00838F" placeholder="Who is using it?" value="'+(dayData.boat_use||'')+'"></div>';
+
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal(){
+  document.getElementById("modal-overlay").classList.remove("open");
+  editingDay=null;
+}
+
+function saveDay(){
+  if(!editingDay)return;
+  var obj={};
+  PEOPLE.forEach(function(p){
+    var v=document.getElementById("field-"+p).value.trim();
+    if(v)obj[p]=v;
+  });
+  var bl=document.getElementById("field-boat_location").value.trim();
+  var bu=document.getElementById("field-boat_use").value.trim();
+  if(bl)obj.boat_location=bl;
+  if(bu)obj.boat_use=bu;
+  DATA[editingDay]=obj;
+  persist();
+  closeModal();
+  render();
+}
+
+function clearDay(){
+  if(!editingDay)return;
+  DATA[editingDay]={};
+  persist();
+  closeModal();
+  render();
+}
+
+document.getElementById("modal-overlay").addEventListener("click",function(e){
+  if(e.target===this)closeModal();
 });
-}
-// ─────────────────────────────────────────────────────────────────────────────
 
-function App() {
-const [data, setData] = useState(null);
-const [visibleMonths, setVisibleMonths] = useState(new Set(ALL_MONTHS));
-const [editing, setEditing] = useState(null);
-const [draft, setDraft] = useState({});
-const [saving, setSaving] = useState(false);
-const saveTimer = useRef(null);
-
-useEffect(() => {
-async function load() {
-const init = buildInitial();
-try {
-const remote = await fbGet();
-setData(remote && Object.keys(remote).length > 0 ? Object.assign({}, init, remote) : init);
-} catch { setData(init); }
-}
-load();
-const interval = setInterval(async () => {
-try {
-const remote = await fbGet();
-if (remote && Object.keys(remote).length > 0)
-setData(() => (Object.assign({}, buildInitial(), remote)));
-} catch {}
-}, 30000);
-return () => clearInterval(interval);
-}, []);
-
-async function persist(nd) {
-setSaving(true);
-clearTimeout(saveTimer.current);
-saveTimer.current = setTimeout(async () => {
-try { await fbSet(nd); } catch {}
-setSaving(false);
-}, 800);
-}
-
-function toggleMonth(m) {
-setVisibleMonths(prev => { const n = new Set(prev); n.has(m) ? n.delete(m) : n.add(m); return n; });
-}
-function openEdit(ds) { setDraft(Object.assign({}, data[ds] || {})); setEditing(ds); }
-function saveEdit() { const nd = Object.assign({}, data, {[editing]: Object.assign({}, draft)}); setData(nd); persist(nd); setEditing(null); }
-function clearDay() { const nd = Object.assign({}, data, {[editing]: {}}); setData(nd); persist(nd); setEditing(null); }
-
-if (!data) return (
-<div style={{ display:“flex”, flexDirection:“column”, alignItems:“center”, justifyContent:“center”, height:“100vh”, background:”#0b1a27”, fontFamily:“Georgia,serif”, color:”#F5D98E”, gap:12 }}>
-<div style={{ fontSize:32 }}>⚓</div>
-<div style={{ fontSize:15, letterSpacing:3, textTransform:“uppercase” }}>Loading your summer…</div>
-</div>
-);
-
-const visibleDays = ALL_DAYS.filter(d => visibleMonths.has(monthOf(d)));
-const totalW = visibleDays.length * COL_W;
-
-const monthBoundaries = [];
-ALL_MONTHS.forEach(m => {
-if (!visibleMonths.has(m)) return;
-const idx = visibleDays.findIndex(d => monthOf(d) === m);
-if (idx >= 0) monthBoundaries.push({ month: m, idx });
-});
-
-// Fixed rows: always Fede, Ale, Mamy, Babu, then boat location, boat use
-const rows = [
-PEOPLE.map(p => ({ key: p, label: p, field: p, color: COLORS[p] })).concat([
-{ key: “boat_location”, label: “🚢 Location”, field: “boat_location”, color: BOAT_LOC_BG },
-{ key: “boat_use”,      label: “🚢 Use”,       field: “boat_use”,      color: BOAT_USE_BG },
-]);
-
-function TrackBackground() {
-return <>
-{visibleDays.map((ds, i) => isWeekend(ds)
-? <div key={ds} style={{ position:“absolute”, left:i*COL_W, top:0, width:COL_W, height:“100%”, background:“rgba(245,217,142,0.04)” }} />
-: null
-)}
-{monthBoundaries.slice(1).map(({ month, idx }) => (
-<div key={month} style={{ position:“absolute”, left:idx*COL_W, top:0, width:2, height:“100%”, background:“rgba(245,217,142,0.15)” }} />
-))}
-</>;
-}
-
-return (
-<div style={{ minHeight:“100vh”, background:”#0b1a27”, fontFamily:“Georgia,serif” }}>
-
-```
-  {/* ── Header ── */}
-  <div style={{ background:"linear-gradient(135deg,#1a3a4a,#0d2333)", padding:"16px 20px 14px", boxShadow:"0 4px 24px rgba(0,0,0,0.5)", position:"sticky", top:0, zIndex:100 }}>
-    <div style={{ maxWidth:1300, margin:"0 auto" }}>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-        <div>
-          <div style={{ color:"#F5D98E", fontSize:10, letterSpacing:4, textTransform:"uppercase", marginBottom:2 }}>⚓ Penguins · Summer 2026</div>
-          <div style={{ color:"#fff", fontSize:20, fontWeight:400 }}>Family Summer Planner</div>
-        </div>
-        {saving && <span style={{ color:"#F5D98E", fontSize:11, opacity:0.8 }}>Saving…</span>}
-      </div>
-
-      {/* Month toggles */}
-      <div style={{ display:"flex", gap:5, alignItems:"center" }}>
-        <span style={{ color:"rgba(255,255,255,0.35)", fontSize:10, letterSpacing:1, textTransform:"uppercase", marginRight:6 }}>Months</span>
-        {ALL_MONTHS.map(m => (
-          <button key={m} onClick={() => toggleMonth(m)} style={{
-            padding:"4px 13px", borderRadius:16, cursor:"pointer", fontFamily:"Georgia,serif", fontSize:12,
-            border: visibleMonths.has(m) ? "2px solid #F5D98E" : "2px solid rgba(255,255,255,0.12)",
-            background: visibleMonths.has(m) ? "#F5D98E" : "transparent",
-            color: visibleMonths.has(m) ? "#0d2333" : "rgba(255,255,255,0.35)",
-            fontWeight: visibleMonths.has(m) ? 700 : 400, transition:"all 0.15s",
-          }}>{m}</button>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  {/* ── Timeline ── */}
-  <div style={{ maxWidth:1300, margin:"0 auto", padding:"24px 0 60px" }}>
-    {/* Scroll container — only the track area scrolls horizontally */}
-    <div style={{ overflowX:"auto", paddingBottom:12 }}>
-      <div style={{ minWidth: LABEL_W + totalW + 2, position:"relative" }}>
-
-        {/* Month headers row */}
-        <div style={{ display:"flex" }}>
-          {/* Sticky label spacer */}
-          <div style={{ width:LABEL_W, flexShrink:0, position:"sticky", left:0, zIndex:10, background:"#0b1a27" }} />
-          {/* Month labels */}
-          <div style={{ display:"flex", flex:1 }}>
-            {monthBoundaries.map(({ month, idx }, i) => {
-              const nextIdx = i + 1 < monthBoundaries.length ? monthBoundaries[i+1].idx : visibleDays.length;
-              return (
-                <div key={month} style={{
-                  width:(nextIdx - idx) * COL_W, flexShrink:0,
-                  padding:"4px 0 3px 8px", fontSize:11, fontWeight:700,
-                  color:"#F5D98E", letterSpacing:2, textTransform:"uppercase",
-                  borderLeft:"2px solid rgba(245,217,142,0.3)",
-                }}>{month}</div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Day numbers row */}
-        <div style={{ display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingBottom:4, marginBottom:8 }}>
-          {/* Sticky label spacer */}
-          <div style={{ width:LABEL_W, flexShrink:0, position:"sticky", left:0, zIndex:10, background:"#0b1a27" }} />
-          {/* Day cells */}
-          <div style={{ display:"flex" }}>
-            {visibleDays.map((ds) => (
-              <div key={ds} onClick={() => openEdit(ds)} style={{
-                width:COL_W, flexShrink:0, textAlign:"center", cursor:"pointer",
-                borderLeft: dayN(ds) === 1 ? "2px solid rgba(245,217,142,0.3)" : "none",
-                paddingTop:3,
-              }}>
-                <div style={{ fontSize:8, color:"rgba(255,255,255,0.22)", marginBottom:1 }}>{dowShort(ds)}</div>
-                <div style={{
-                  fontSize:10, fontWeight: isWeekend(ds) ? 700 : 400,
-                  color: isWeekend(ds) ? "#F5D98E" : "rgba(255,255,255,0.4)",
-                  background: isWeekend(ds) ? "rgba(245,217,142,0.1)" : "transparent",
-                  borderRadius:3, lineHeight:"17px",
-                }}>{dayN(ds)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* One row per person + boat rows */}
-        {rows.map((row, ri) => {
-          const blocks = getBlocks(visibleDays, d => data[d]?.[row.field] || null);
-          const isBoatDivider = ri === PEOPLE.length;
-
-          return (
-            <div key={row.key}>
-              {/* Divider before boat rows */}
-              {isBoatDivider && (
-                <div style={{ display:"flex", alignItems:"center", margin:"10px 0 10px" }}>
-                  <div style={{ width:LABEL_W, flexShrink:0, position:"sticky", left:0, zIndex:10, background:"#0b1a27" }} />
-                  <div style={{ flex:1, height:1, background:"rgba(0,172,193,0.2)" }} />
-                </div>
-              )}
-
-              <div style={{ display:"flex", alignItems:"center", marginBottom:ROW_GAP, height:ROW_H }}>
-                {/* Sticky label */}
-                <div style={{
-                  width:LABEL_W, flexShrink:0,
-                  position:"sticky", left:0, zIndex:10,
-                  background:"#0b1a27",
-                  paddingRight:10, textAlign:"right",
-                  fontSize:12, fontWeight:700, color: row.color,
-                  letterSpacing:0.3, whiteSpace:"nowrap",
-                  height:ROW_H, display:"flex", alignItems:"center", justifyContent:"flex-end",
-                }}>
-                  {row.label}
-                </div>
-
-                {/* Track */}
-                <div style={{ position:"relative", width:totalW, height:ROW_H, flexShrink:0 }}>
-                  <TrackBackground />
-
-                  {/* Activity blocks */}
-                  {blocks.map((block, bi) => {
-                    const x = block.startIdx * COL_W;
-                    const w = (block.endIdx - block.startIdx + 1) * COL_W;
-                    const bg = activityColor(block.value, row.field);
-                    return (
-                      <div key={bi} style={{
-                        position:"absolute",
-                        left: x + 2, top: 3,
-                        width: w - 4, height: ROW_H - 8,
-                        borderRadius: 5,
-                        background: bg,
-                        display:"flex", alignItems:"center", justifyContent:"center",
-                        overflow:"hidden",
-                        boxShadow:"0 2px 8px rgba(0,0,0,0.3)",
-                        pointerEvents:"none",
-                      }}>
-                        <span style={{
-                          fontSize:11, fontWeight:700, color:"#fff",
-                          whiteSpace:"nowrap", overflow:"hidden",
-                          textOverflow:"ellipsis", maxWidth:"92%",
-                          textAlign:"center", letterSpacing:0.3,
-                        }}>
-                          {block.value}
-                        </span>
-                      </div>
-                    );
-                  })}
-
-                  {/* Click zones */}
-                  {visibleDays.map((ds, i) => (
-                    <div key={ds} onClick={() => openEdit(ds)} style={{
-                      position:"absolute", left:i*COL_W, top:0,
-                      width:COL_W, height:"100%",
-                      cursor:"pointer", zIndex:2,
-                    }} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Bottom ruler */}
-        <div style={{ display:"flex", marginTop:8, borderTop:"1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ width:LABEL_W, flexShrink:0, position:"sticky", left:0, zIndex:10, background:"#0b1a27" }} />
-          {visibleDays.map(ds => (
-            <div key={ds} style={{ width:COL_W, flexShrink:0, textAlign:"center", paddingTop:4 }}>
-              <div style={{ fontSize:8, color:"rgba(255,255,255,0.12)" }}>{dayN(ds)}</div>
-            </div>
-          ))}
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  {/* ── Edit Modal ── */}
-  {editing && (
-    <div onClick={e => { if (e.target === e.currentTarget) setEditing(null); }}
-      style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.78)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
-      <div style={{ background:"#132534", borderRadius:14, width:"100%", maxWidth:420, boxShadow:"0 24px 60px rgba(0,0,0,0.6)", overflow:"hidden", border:"1px solid rgba(245,217,142,0.12)" }}>
-        <div style={{ background:"linear-gradient(135deg,#1a3a4a,#0d2333)", padding:"14px 20px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div>
-            <div style={{ color:"#F5D98E", fontSize:9, letterSpacing:3, textTransform:"uppercase", marginBottom:2 }}>
-              {dowFull(editing)}, {monthOf(editing)} {dayN(editing)}
-            </div>
-            <div style={{ color:"#fff", fontSize:15 }}>Edit Day</div>
-          </div>
-          <button onClick={() => setEditing(null)} style={{ background:"rgba(255,255,255,0.08)", border:"none", color:"#fff", borderRadius:"50%", width:26, height:26, cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>×</button>
-        </div>
-
-        <div style={{ padding:"14px 20px" }}>
-          <div style={{ fontSize:9, letterSpacing:2, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", marginBottom:8 }}>Family</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:16 }}>
-            {PEOPLE.map(p => (
-              <div key={p} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <div style={{ width:7, height:7, borderRadius:"50%", background:COLORS[p], flexShrink:0 }} />
-                <label style={{ width:38, fontSize:12, color:COLORS[p], fontWeight:700 }}>{p}</label>
-                <input
-                  value={draft[p] || ""}
-                  onChange={e => setDraft(v => Object.assign({}, v, {[p]: e.target.value}))}
-                  placeholder={`What is ${p} doing?`}
-                  style={{ flex:1, border:`1.5px solid ${COLORS[p]}`, borderRadius:6, padding:"5px 8px", fontSize:12, background:"rgba(255,255,255,0.04)", color:"#fff", fontFamily:"Georgia,serif", outline:"none" }}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div style={{ fontSize:9, letterSpacing:2, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", marginBottom:8 }}>🚢 Penguins</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:18 }}>
-            {[
-              ["boat_location", BOAT_LOC_BG, "📍", "Location", "Where is the boat?"],
-              ["boat_use",      BOAT_USE_BG, "👥", "Using it",  "Who's using it?"],
-            ].map(([key, col, icon, label, ph]) => (
-              <div key={key} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:12 }}>{icon}</span>
-                <label style={{ width:50, fontSize:12, color:col, fontWeight:700 }}>{label}</label>
-                <input
-                  value={draft[key] || ""}
-                  onChange={e => setDraft(v => Object.assign({}, v, {[key]: e.target.value}))}
-                  placeholder={ph}
-                  style={{ flex:1, border:`1.5px solid ${col}`, borderRadius:6, padding:"5px 8px", fontSize:12, background:"rgba(255,255,255,0.04)", color:"#fff", fontFamily:"Georgia,serif", outline:"none" }}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
-            <button onClick={clearDay} style={{ padding:"6px 12px", borderRadius:6, border:"1px solid rgba(255,255,255,0.1)", background:"transparent", color:"rgba(255,255,255,0.35)", fontSize:12, cursor:"pointer", fontFamily:"Georgia,serif" }}>Clear</button>
-            <button onClick={() => setEditing(null)} style={{ padding:"6px 12px", borderRadius:6, border:"1px solid rgba(255,255,255,0.1)", background:"transparent", color:"rgba(255,255,255,0.55)", fontSize:12, cursor:"pointer", fontFamily:"Georgia,serif" }}>Cancel</button>
-            <button onClick={saveEdit} style={{ padding:"6px 16px", borderRadius:6, border:"none", background:"linear-gradient(135deg,#F5D98E,#E6C84A)", color:"#0d2333", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"Georgia,serif" }}>Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )}
-</div>
-```
-
-);
-}
-
-ReactDOM.createRoot(document.getElementById(‘root’)).render(<App />);
+init();
 </script>
 
 </body>
