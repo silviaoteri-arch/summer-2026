@@ -98,6 +98,14 @@ body{background:#0b1a27;font-family:Georgia,serif;color:#fff;min-height:100vh}
       <div id="boat-fields"></div>
       <div class="section-label" id="pietrasanta-section-label" style="margin-top:14px">🏡 Pietrasanta</div>
       <div id="pietrasanta-fields"></div>
+      <div style="margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
+        <div style="font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px">Apply to date range</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:12px;color:rgba(255,255,255,0.5)">From this day until</span>
+          <input type="date" id="apply-until" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 8px;color:#fff;font-size:12px;font-family:Georgia,serif;outline:none"/>
+          <button onclick="applyRange()" style="padding:5px 12px;border-radius:6px;border:none;background:#F5D98E;color:#0d2333;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif">Apply</button>
+        </div>
+      </div>
       <div id="modal-buttons">
         <button class="btn-clear" onclick="clearDay()">Clear</button>
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -403,6 +411,8 @@ function openModal(ds){
       document.getElementById("pietrasanta-section-label").style.display="none";
     if(pff)pff.style.display="none";
   }
+  var applyUntilEl=document.getElementById("apply-until");
+  if(applyUntilEl)applyUntilEl.value=ds;
   document.getElementById("modal-overlay").classList.add("open");
 }
 
@@ -462,6 +472,47 @@ if(CAPTAIN_MODE){
   var fl=document.getElementById("family-section-label");
   if(fl)fl.style.display="none";
 }
+function applyRange(){
+  if(!editingDay)return;
+  var until=document.getElementById("apply-until").value;
+  if(!until||until<editingDay){alert("Please pick an end date on or after "+editingDay);return;}
+  
+  // First save current day's values into a temp object
+  var obj={};
+  if(!CAPTAIN_MODE){
+    PEOPLE.forEach(function(p){
+      var el=document.getElementById("field-"+p);
+      if(el){var v=el.value.trim();if(v)obj[p]=v;}
+    });
+    var pv=document.getElementById("field-pietrasanta");
+    if(pv&&pv.value.trim())obj.pietrasanta=pv.value.trim();
+  }
+  var bl=document.getElementById("field-boat_location");
+  var bu=document.getElementById("field-boat_use");
+  if(bl&&bl.value.trim())obj.boat_location=bl.value.trim();
+  if(bu&&bu.value.trim())obj.boat_use=bu.value.trim();
+
+  // Apply to all days in range
+  ALL_DAYS.forEach(function(d){
+    if(d>=editingDay&&d<=until){
+      if(CAPTAIN_MODE){
+        var existing=Object.assign({},DATA[d]||{});
+        if(obj.boat_location)existing.boat_location=obj.boat_location;
+        else delete existing.boat_location;
+        if(obj.boat_use)existing.boat_use=obj.boat_use;
+        else delete existing.boat_use;
+        DATA[d]=existing;
+      } else {
+        DATA[d]=Object.assign({},obj);
+      }
+    }
+  });
+
+  persist();
+  closeModal();
+  render();
+}
+
 init();
 </script>
 
