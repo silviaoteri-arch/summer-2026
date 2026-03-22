@@ -96,6 +96,8 @@ body{background:#0b1a27;font-family:Georgia,serif;color:#fff;min-height:100vh}
       <div id="people-fields"></div>
       <div class="section-label" style="margin-top:14px">🚢 Penguins</div>
       <div id="boat-fields"></div>
+      <div class="section-label" id="pietrasanta-section-label" style="margin-top:14px">🏡 Pietrasanta</div>
+      <div id="pietrasanta-fields"></div>
       <div id="modal-buttons">
         <button class="btn-clear" onclick="clearDay()">Clear</button>
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -115,7 +117,7 @@ const ACTIVITY_COLORS = {
   "PENGUINS CANNES":"#29B6F6","PENGUINS CANNES?":"#29B6F6",
   "PENGUINS GREECE with Ricky":"#039BE5","PENGUINS GREECE with cousins":"#0288D1",
   "RENTED":"#757575","FORMENTI":"#29B6F6","SAN LORENZO":"#757575",
-  "CANNES":"#1565C0","TRANSFER":"#546E7A"
+  "CANNES":"#1565C0","TRANSFER":"#546E7A","London":"#9E9E9E","Boat":"#29B6F6","Pietrasanta":"#43A047","Milan":"#757575"
 };
 const ALL_MONTHS = ["April","May","June","July","August","September"];
 const COL_W = 34, LABEL_W = 90, ROW_H = 34;
@@ -268,13 +270,22 @@ function render(){
   var rows=CAPTAIN_MODE?[]:(PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};}));
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
+  rows.push({key:"pietrasanta_divider",label:"",field:"",color:""});
+  rows.push({key:"pietrasanta",label:"🏡 Pietrasanta",field:"pietrasanta",color:"#43A047"});
 
   rows.forEach(function(row,ri){
     if(ri===PEOPLE.length){
       var div=document.createElement("div");
       div.className="boat-divider";
-      div.innerHTML='<div class="boat-divider-label"></div><div class="boat-divider-line"></div>';
+      div.innerHTML='<div class="boat-divider-label"></div><div class="boat-divider-line" style="background:rgba(0,172,193,0.2)"></div>';
       tl.appendChild(div);
+    }
+    if(row.key==="pietrasanta_divider"){
+      var div2=document.createElement("div");
+      div2.className="boat-divider";
+      div2.innerHTML='<div class="boat-divider-label"></div><div class="boat-divider-line" style="background:rgba(67,160,71,0.3)"></div>';
+      tl.appendChild(div2);
+      return;
     }
     var wrap=document.createElement("div");
     wrap.className="row-wrap";
@@ -362,7 +373,7 @@ function openModal(ds){
       row.className="field-row";
       row.innerHTML='<div class="field-dot" style="background:'+COLORS[p]+'"></div>'
         +'<div class="field-label" style="color:'+COLORS[p]+'">'+p+'</div>'
-        +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" placeholder="What is '+p+' doing?" value="'+(dayData[p]||'')+'">';
+        +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" placeholder="What is '+p+' doing?" list="dl-person" value="'+(dayData[p]||'')+'">';
       pf.appendChild(row);
     });
   }
@@ -371,12 +382,24 @@ function openModal(ds){
   bf.innerHTML='<div class="field-row">'
     +'<span style="font-size:12px">📍</span>'
     +'<div class="field-label" style="color:#00ACC1">Location</div>'
-    +'<input class="field-input" id="field-boat_location" style="border:1.5px solid #00ACC1" placeholder="Where is the boat?" value="'+(dayData.boat_location||'')+'"></div>'
+    +'<input class="field-input" id="field-boat_location" style="border:1.5px solid #00ACC1" placeholder="Where is the boat?" list="dl-boat-location" value="'+(dayData.boat_location||'')+'"></div>'
     +'<div class="field-row">'
     +'<span style="font-size:12px">👥</span>'
     +'<div class="field-label" style="color:#00838F">Using it</div>'
-    +'<input class="field-input" id="field-boat_use" style="border:1.5px solid #00838F" placeholder="Who is using it?" value="'+(dayData.boat_use||'')+'"></div>';
+    +'<input class="field-input" id="field-boat_use" style="border:1.5px solid #00838F" placeholder="Who is using it?" list="dl-boat-use" value="'+(dayData.boat_use||'')+'"></div>';
 
+  var pff=document.getElementById("pietrasanta-fields");
+  if(pff){
+    var existingP=(DATA[ds]||{}).pietrasanta||"";
+    pff.innerHTML='<div class="field-row">'
+      +'<span style="font-size:12px">🏡</span>'
+      +'<div class="field-label" style="color:#43A047;width:50px">Using it</div>'
+      +'<input class="field-input" id="field-pietrasanta" style="border:1.5px solid #43A047" list="dl-person" placeholder="Who is staying?" value="'+existingP+'"></div>';
+  }
+  if(CAPTAIN_MODE&&document.getElementById("pietrasanta-section-label")){
+    document.getElementById("pietrasanta-section-label").style.display="none";
+    if(pff)pff.style.display="none";
+  }
   document.getElementById("modal-overlay").classList.add("open");
 }
 
@@ -406,6 +429,14 @@ function saveDay(){
     if(bu)existing.boat_use=bu; else delete existing.boat_use;
     DATA[editingDay]=existing;
   }
+  var pv=document.getElementById("field-pietrasanta");
+  if(pv){
+    var pvv=pv.value.trim();
+    if(!CAPTAIN_MODE){
+      if(pvv)DATA[editingDay].pietrasanta=pvv;
+      else delete DATA[editingDay].pietrasanta;
+    }
+  }
   persist();
   closeModal();
   render();
@@ -431,5 +462,26 @@ if(CAPTAIN_MODE){
 init();
 </script>
 
+<datalist id="dl-person">
+  <option value="London">
+  <option value="Boat">
+  <option value="Pietrasanta">
+  <option value="Milan">
+</datalist>
+<datalist id="dl-boat-location">
+  <option value="CANNES">
+  <option value="ANTIBES">
+  <option value="GREECE">
+  <option value="PORTO CERVO">
+  <option value="PORTO">
+  <option value="CERVO">
+  <option value="TRANSFER">
+  <option value="SAN LORENZO">
+</datalist>
+<datalist id="dl-boat-use">
+  <option value="FORMENTI">
+  <option value="RENTED">
+  <option value="SAN LORENZO">
+</datalist>
 </body>
 </html>
