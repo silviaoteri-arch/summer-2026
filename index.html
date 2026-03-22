@@ -270,8 +270,10 @@ function render(){
   var rows=CAPTAIN_MODE?[]:(PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};}));
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
-  rows.push({key:"pietrasanta_divider",label:"",field:"",color:""});
-  rows.push({key:"pietrasanta",label:"🏡 Pietrasanta",field:"pietrasanta",color:"#43A047"});
+  if(!CAPTAIN_MODE){
+    rows.push({key:"pietrasanta_divider",label:"",field:"",color:""});
+    rows.push({key:"pietrasanta",label:"🏡 Pietrasanta",field:"pietrasanta",color:"#43A047"});
+  }
 
   rows.forEach(function(row,ri){
     if(ri===PEOPLE.length){
@@ -396,8 +398,9 @@ function openModal(ds){
       +'<div class="field-label" style="color:#43A047;width:50px">Using it</div>'
       +'<input class="field-input" id="field-pietrasanta" style="border:1.5px solid #43A047" list="dl-person" placeholder="Who is staying?" value="'+existingP+'"></div>';
   }
-  if(CAPTAIN_MODE&&document.getElementById("pietrasanta-section-label")){
-    document.getElementById("pietrasanta-section-label").style.display="none";
+  if(CAPTAIN_MODE){
+    if(document.getElementById("pietrasanta-section-label"))
+      document.getElementById("pietrasanta-section-label").style.display="none";
     if(pff)pff.style.display="none";
   }
   document.getElementById("modal-overlay").classList.add("open");
