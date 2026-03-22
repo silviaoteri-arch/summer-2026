@@ -65,7 +65,7 @@ body{background:#0b1a27;font-family:Georgia,serif;color:#fff;min-height:100vh}
   <div style="max-width:1300px;margin:0 auto">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div class="subtitle">Penguins · Summer 2026</div>
+        <div class="subtitle" id="mode-label">Penguins · Summer 2026</div>
         <div class="title">Family Summer Planner</div>
       </div>
       <div id="saving">Saving…</div>
@@ -92,7 +92,7 @@ body{background:#0b1a27;font-family:Georgia,serif;color:#fff;min-height:100vh}
       <button id="modal-close" onclick="closeModal()">×</button>
     </div>
     <div id="modal-body">
-      <div class="section-label">Family</div>
+      <div class="section-label" id="family-section-label">Family</div>
       <div id="people-fields"></div>
       <div class="section-label" style="margin-top:14px">🚢 Penguins</div>
       <div id="boat-fields"></div>
@@ -154,6 +154,7 @@ var DATA={};
 var visibleMonths=new Set(ALL_MONTHS);
 var editingDay=null;
 var saveTimer=null;
+var CAPTAIN_MODE=window.location.search.indexOf("captain")>=0;
 
 async function fbGet(){
   try{
@@ -264,7 +265,7 @@ function render(){
   tl.appendChild(dhr);
 
   // Rows
-  var rows=PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};});
+  var rows=CAPTAIN_MODE?[]:(PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};}));
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
 
@@ -355,14 +356,16 @@ function openModal(ds){
 
   var pf=document.getElementById("people-fields");
   pf.innerHTML="";
-  PEOPLE.forEach(function(p){
-    var row=document.createElement("div");
-    row.className="field-row";
-    row.innerHTML='<div class="field-dot" style="background:'+COLORS[p]+'"></div>'
-      +'<div class="field-label" style="color:'+COLORS[p]+'">'+p+'</div>'
-      +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" placeholder="What is '+p+' doing?" value="'+(dayData[p]||'')+'">';
-    pf.appendChild(row);
-  });
+  if(!CAPTAIN_MODE){
+    PEOPLE.forEach(function(p){
+      var row=document.createElement("div");
+      row.className="field-row";
+      row.innerHTML='<div class="field-dot" style="background:'+COLORS[p]+'"></div>'
+        +'<div class="field-label" style="color:'+COLORS[p]+'">'+p+'</div>'
+        +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" placeholder="What is '+p+' doing?" value="'+(dayData[p]||'')+'">';
+      pf.appendChild(row);
+    });
+  }
 
   var bf=document.getElementById("boat-fields");
   bf.innerHTML='<div class="field-row">'
@@ -384,16 +387,25 @@ function closeModal(){
 
 function saveDay(){
   if(!editingDay)return;
-  var obj={};
-  PEOPLE.forEach(function(p){
-    var v=document.getElementById("field-"+p).value.trim();
-    if(v)obj[p]=v;
-  });
-  var bl=document.getElementById("field-boat_location").value.trim();
-  var bu=document.getElementById("field-boat_use").value.trim();
-  if(bl)obj.boat_location=bl;
-  if(bu)obj.boat_use=bu;
-  DATA[editingDay]=obj;
+  var existing=Object.assign({},DATA[editingDay]||{});
+  if(!CAPTAIN_MODE){
+    var obj={};
+    PEOPLE.forEach(function(p){
+      var v=document.getElementById("field-"+p).value.trim();
+      if(v)obj[p]=v;
+    });
+    var bl=document.getElementById("field-boat_location").value.trim();
+    var bu=document.getElementById("field-boat_use").value.trim();
+    if(bl)obj.boat_location=bl;
+    if(bu)obj.boat_use=bu;
+    DATA[editingDay]=obj;
+  } else {
+    var bl=document.getElementById("field-boat_location").value.trim();
+    var bu=document.getElementById("field-boat_use").value.trim();
+    if(bl)existing.boat_location=bl; else delete existing.boat_location;
+    if(bu)existing.boat_use=bu; else delete existing.boat_use;
+    DATA[editingDay]=existing;
+  }
   persist();
   closeModal();
   render();
@@ -411,6 +423,11 @@ document.getElementById("modal-overlay").addEventListener("click",function(e){
   if(e.target===this)closeModal();
 });
 
+if(CAPTAIN_MODE){
+  document.getElementById("mode-label").textContent="Penguins · Summer 2026 · Captain View";
+  var fl=document.getElementById("family-section-label");
+  if(fl)fl.style.display="none";
+}
 init();
 </script>
 
