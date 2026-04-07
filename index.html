@@ -105,6 +105,10 @@ background-size: 28px 28px;
       <div id="people-fields"></div>
       <div class="section-label" style="margin-top:14px">🚢 Penguins</div>
       <div id="boat-fields"></div>
+      <div class="section-label" id="extended-section-label" style="margin-top:14px">Nina &amp; Martino</div>
+      <div id="extended-fields"></div>
+      <div class="section-label" id="dog-section-label" style="margin-top:14px">🐶</div>
+      <div id="dog-fields"></div>
       <div class="section-label" id="pietrasanta-section-label" style="margin-top:14px">🏡 Pietrasanta</div>
       <div id="pietrasanta-fields"></div>
       <div style="margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
@@ -127,7 +131,8 @@ background-size: 28px 28px;
 <script>
 const FIREBASE_URL = "https://summer-2026-eed9c-default-rtdb.firebaseio.com";
 const PEOPLE = ["Fede","Ale","Mamy","Babu"];
-const COLORS = {Fede:"#FF9800",Ale:"#1E88E5",Mamy:"#E91E63",Babu:"#43A047"};
+const EXTENDED = ["Nina","Martino"];
+const COLORS = {Fede:"#FF9800",Ale:"#1E88E5",Mamy:"#E91E63",Babu:"#43A047",Nina:"#8E24AA",Martino:"#00897B"};
 const ACTIVITY_COLORS = {
   "WIMBLEDON":"#2E7D32","NADAL CAMP":"#C62828","VOLLEY CAMP":"#F9A825",
   "SYDNEY?":"#E91E8C","GREECE":"#EF6C00",
@@ -285,6 +290,14 @@ function render(){
 
   // Rows
   var rows=CAPTAIN_MODE?[]:(PEOPLE.map(function(p){return{key:p,label:p,field:p,color:COLORS[p]};}));
+  if(!CAPTAIN_MODE){
+    rows.push({key:"nina_martino_divider",label:"",field:"",color:""});
+    rows.push({key:"Nina",label:"Nina",field:"Nina",color:COLORS["Nina"]});
+    rows.push({key:"Martino",label:"Martino",field:"Martino",color:COLORS["Martino"]});
+    rows.push({key:"dog_divider",label:"",field:"",color:""});
+    rows.push({key:"dog",label:"🐶",field:"dog",color:"#795548"});
+  }
+  rows.push({key:"boat_divider",label:"",field:"",color:""});
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
   if(!CAPTAIN_MODE){
@@ -293,17 +306,17 @@ function render(){
   }
 
   rows.forEach(function(row,ri){
-    if(ri===PEOPLE.length){
-      var div=document.createElement("div");
-      div.className="boat-divider";
-      div.innerHTML='<div class="boat-divider-label" style="background:#e8f4fd"></div><div class="boat-divider-line" style="background:rgba(0,172,193,0.2)"></div>';
-      tl.appendChild(div);
-    }
-    if(row.key==="pietrasanta_divider"){
-      var div2=document.createElement("div");
-      div2.className="boat-divider";
-      div2.innerHTML='<div class="boat-divider-label" style="background:#e8f4fd"></div><div class="boat-divider-line" style="background:rgba(67,160,71,0.3)"></div>';
-      tl.appendChild(div2);
+    // Handle all divider rows
+    if(row.key==="nina_martino_divider"||row.key==="dog_divider"||row.key==="boat_divider"||row.key==="pietrasanta_divider"){
+      var divColor="rgba(0,0,0,0.1)";
+      if(row.key==="boat_divider")divColor="rgba(0,172,193,0.3)";
+      if(row.key==="pietrasanta_divider")divColor="rgba(67,160,71,0.3)";
+      if(row.key==="nina_martino_divider")divColor="rgba(142,36,170,0.2)";
+      if(row.key==="dog_divider")divColor="rgba(121,85,72,0.2)";
+      var divEl=document.createElement("div");
+      divEl.className="boat-divider";
+      divEl.innerHTML='<div class="boat-divider-label" style="background:#e8f4fd"></div><div class="boat-divider-line" style="background:'+divColor+'"></div>';
+      tl.appendChild(divEl);
       return;
     }
     var wrap=document.createElement("div");
@@ -411,6 +424,25 @@ function openModal(ds){
     +'<div class="field-label" style="color:#00838F">Using it</div>'
     +'<input class="field-input" id="field-boat_use" style="border:1.5px solid #00838F" placeholder="Who is using it?" list="dl-boat-use" value="'+(dayData.boat_use||'')+'"></div>';
 
+  var ef=document.getElementById("extended-fields");
+  if(ef&&!CAPTAIN_MODE){
+    ef.innerHTML="";
+    EXTENDED.forEach(function(p){
+      var row=document.createElement("div");
+      row.className="field-row";
+      row.innerHTML='<div class="field-dot" style="background:'+COLORS[p]+'"></div>'
+        +'<div class="field-label" style="color:'+COLORS[p]+'">'+p+'</div>'
+        +'<input class="field-input" id="field-'+p+'" style="border:1.5px solid '+COLORS[p]+'" list="dl-person" placeholder="Where is '+p+'?" value="'+(dayData[p]||'')+'">';
+      ef.appendChild(row);
+    });
+  }
+  var df=document.getElementById("dog-fields");
+  if(df&&!CAPTAIN_MODE){
+    df.innerHTML='<div class="field-row">'
+      +'<span style="font-size:12px">🐶</span>'
+      +'<div class="field-label" style="color:#795548">Where</div>'
+      +'<input class="field-input" id="field-dog" style="border:1.5px solid #795548" list="dl-person" placeholder="Where is the dog?" value="'+(dayData.dog||'')+'"></div>';
+  }
   var pff=document.getElementById("pietrasanta-fields");
   if(pff){
     var existingP=(DATA[ds]||{}).pietrasanta||"";
@@ -420,9 +452,12 @@ function openModal(ds){
       +'<input class="field-input" id="field-pietrasanta" style="border:1.5px solid #43A047" list="dl-person" placeholder="Who is staying?" value="'+existingP+'"></div>';
   }
   if(CAPTAIN_MODE){
-    if(document.getElementById("pietrasanta-section-label"))
-      document.getElementById("pietrasanta-section-label").style.display="none";
-    if(pff)pff.style.display="none";
+    ["extended-section-label","dog-section-label","pietrasanta-section-label"].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display="none";
+    });
+    ["extended-fields","dog-fields","pietrasanta-fields"].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display="none";
+    });
   }
   var applyUntilEl=document.getElementById("apply-until");
   if(applyUntilEl)applyUntilEl.value=ds;
@@ -497,6 +532,12 @@ function applyRange(){
       var el=document.getElementById("field-"+p);
       if(el){var v=el.value.trim();if(v)obj[p]=v;}
     });
+    EXTENDED.forEach(function(p){
+      var el=document.getElementById("field-"+p);
+      if(el){var v=el.value.trim();if(v)obj[p]=v;}
+    });
+    var dogEl=document.getElementById("field-dog");
+    if(dogEl&&dogEl.value.trim())obj.dog=dogEl.value.trim();
     var pv=document.getElementById("field-pietrasanta");
     if(pv&&pv.value.trim())obj.pietrasanta=pv.value.trim();
   }
@@ -514,6 +555,8 @@ function applyRange(){
         else delete existing.boat_location;
         if(obj.boat_use)existing.boat_use=obj.boat_use;
         else delete existing.boat_use;
+        if(obj.dog)existing.dog=obj.dog;
+        else delete existing.dog;
         DATA[d]=existing;
       } else {
         DATA[d]=Object.assign({},obj);
@@ -534,6 +577,9 @@ init();
   <option value="Boat">
   <option value="Pietrasanta">
   <option value="Milan">
+  <option value="Away">
+  <option value="Italy">
+  <option value="Ecuador">
 </datalist>
 <datalist id="dl-boat-location">
   <option value="CANNES">
