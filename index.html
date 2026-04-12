@@ -152,7 +152,7 @@ const ACTIVITY_COLORS = {
   "PENGUINS CANNES":"#29B6F6","PENGUINS CANNES?":"#29B6F6",
   "PENGUINS GREECE with Ricky":"#039BE5","PENGUINS GREECE with cousins":"#0288D1",
   "RENTED":"#757575","FORMENTI":"#29B6F6","SAN LORENZO":"#757575",
-  "CANNES":"#1565C0","TRANSFER":"#546E7A","London":"#9E9E9E","Boat":"#29B6F6","Pietrasanta":"#43A047","Milan":"#757575"
+  "CANNES":"#1565C0","TRANSFER":"#546E7A","London":"#9E9E9E","Boat":"#29B6F6","Pietrasanta":"#7CB87C","Milan":"#757575"
 };
 const ALL_MONTHS = ["April","May","June","July","August","September","October","November","December","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027","August 2027"];
 const COL_W = 34, LABEL_W = 90, ROW_H = 34;
@@ -189,7 +189,8 @@ function buildInitial(){
 
 function actColor(val,field){
   if(field==="boat_location"&&val==="GREECE")return"#1976D2";
-  return ACTIVITY_COLORS[val]||"#455A64";
+  if(field==="boat_location"||field==="boat_use")return ACTIVITY_COLORS[val]||"#1565C0";
+  return ACTIVITY_COLORS[val]||"#9E9E9E";
 }
 
 var DATA={};
@@ -371,6 +372,14 @@ function render(){
         el.classList.add("penguin-bg");
       }
       el.innerHTML='<span>'+block.value+'</span>';
+      el.style.pointerEvents='auto';
+      el.style.cursor='pointer';
+      (function(f,v,d){
+        el.addEventListener('click',function(e){
+          e.stopPropagation();
+          deleteBlock(f,v,d);
+        });
+      })(row.field, block.value, visibleDays[block.startIdx]);
       track.appendChild(el);
     });
 
@@ -541,6 +550,26 @@ if(CAPTAIN_MODE){
   var fl=document.getElementById("family-section-label");
   if(fl)fl.style.display="none";
 }
+function deleteBlock(field, value, startDay){
+  // Find all consecutive days with same value in this field
+  var idx = ALL_DAYS.indexOf(startDay);
+  if(idx < 0) return;
+  // Walk backwards to find block start
+  while(idx > 0 && (DATA[ALL_DAYS[idx-1]]||{})[field] === value) idx--;
+  var blockStart = idx;
+  // Walk forwards to find block end
+  while(idx < ALL_DAYS.length && (DATA[ALL_DAYS[idx]]||{})[field] === value) idx++;
+  var blockEnd = idx;
+  // Confirm and delete
+  var days = blockEnd - blockStart;
+  if(!confirm('Delete "'+value+'" for '+days+' day'+(days>1?'s':'')+' ('+ALL_DAYS[blockStart]+' to '+ALL_DAYS[blockEnd-1]+')?')) return;
+  for(var i=blockStart; i<blockEnd; i++){
+    if(DATA[ALL_DAYS[i]]) delete DATA[ALL_DAYS[i]][field];
+  }
+  persist();
+  render();
+}
+
 function applyRange(){
   if(!editingDay)return;
   var until=document.getElementById("apply-until").value;
