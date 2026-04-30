@@ -318,6 +318,7 @@ function render(){
   rows.push({key:"boat_divider",label:"",field:"",color:""});
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
+  rows.push({key:"cabin_divider",label:"",field:"",color:""});
   rows.push({key:"cabin_master",label:"Master",field:"cabin_master",color:"#0277BD"});
   rows.push({key:"cabin_armadio",label:"Armadio",field:"cabin_armadio",color:"#0288D1"});
   rows.push({key:"cabin_multipurpose",label:"Multi-purpose",field:"cabin_multipurpose",color:"#039BE5"});
@@ -540,44 +541,43 @@ function closeModal(){
 
 function saveDay(){
   if(!editingDay)return;
-  var existing=Object.assign({},DATA[editingDay]||{});
-  if(!CAPTAIN_MODE){
-    var obj={};
-    PEOPLE.forEach(function(p){
-      var v=document.getElementById("field-"+p).value.trim();
-      if(v)obj[p]=v;
-    });
+  var obj={};
+
+  if(CAPTAIN_MODE){
+    // Captain: preserve existing, only update boat fields
+    obj=Object.assign({},DATA[editingDay]||{});
     var bl=document.getElementById("field-boat_location").value.trim();
     var bu=document.getElementById("field-boat_use").value.trim();
-    if(bl)obj.boat_location=bl;
-    if(bu)obj.boat_use=bu;
-    DATA[editingDay]=obj;
+    if(bl)obj.boat_location=bl; else delete obj.boat_location;
+    if(bu)obj.boat_use=bu; else delete obj.boat_use;
   } else {
-    var bl=document.getElementById("field-boat_location").value.trim();
-    var bu=document.getElementById("field-boat_use").value.trim();
-    if(bl)existing.boat_location=bl; else delete existing.boat_location;
-    if(bu)existing.boat_use=bu; else delete existing.boat_use;
-    DATA[editingDay]=existing;
-  }
-  var cabinKeys=["cabin_master","cabin_armadio","cabin_multipurpose","cabin_matrimoniale","cabin_doppia"];
-  if(!CAPTAIN_MODE){
-    cabinKeys.forEach(function(k){
-      var el=document.getElementById("field-"+k);
-      if(el){
-        var v=el.value.trim();
-        if(v)DATA[editingDay][k]=v;
-        else delete DATA[editingDay][k];
-      }
+    // Family: save all fields into one object
+    PEOPLE.forEach(function(p){
+      var el=document.getElementById("field-"+p);
+      if(el){var v=el.value.trim();if(v)obj[p]=v;}
     });
+    EXTENDED.forEach(function(p){
+      var el=document.getElementById("field-"+p);
+      if(el){var v=el.value.trim();if(v)obj[p]=v;}
+    });
+    var bl=document.getElementById("field-boat_location");
+    var bu=document.getElementById("field-boat_use");
+    if(bl&&bl.value.trim())obj.boat_location=bl.value.trim();
+    if(bu&&bu.value.trim())obj.boat_use=bu.value.trim();
+    // Cabins
+    ["cabin_master","cabin_armadio","cabin_multipurpose","cabin_matrimoniale","cabin_doppia"].forEach(function(k){
+      var el=document.getElementById("field-"+k);
+      if(el&&el.value.trim())obj[k]=el.value.trim();
+    });
+    // Dog
+    var dv=document.getElementById("field-dog");
+    if(dv&&dv.value.trim())obj.dog=dv.value.trim();
+    // Pietrasanta
+    var pv=document.getElementById("field-pietrasanta");
+    if(pv&&pv.value.trim())obj.pietrasanta=pv.value.trim();
   }
-  var pv=document.getElementById("field-pietrasanta");
-  if(pv){
-    var pvv=pv.value.trim();
-    if(!CAPTAIN_MODE){
-      if(pvv)DATA[editingDay].pietrasanta=pvv;
-      else delete DATA[editingDay].pietrasanta;
-    }
-  }
+
+  DATA[editingDay]=obj;
   persist();
   closeModal();
   render();
