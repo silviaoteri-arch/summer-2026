@@ -624,43 +624,31 @@ function applyRange(){
   if(!editingDay)return;
   var until=document.getElementById("apply-until").value;
   if(!until||until<editingDay){alert("Please pick an end date on or after "+editingDay);return;}
-  
-  // First save current day's values into a temp object
-  var obj={};
-  if(!CAPTAIN_MODE){
-    PEOPLE.forEach(function(p){
-      var el=document.getElementById("field-"+p);
-      if(el){var v=el.value.trim();if(v)obj[p]=v;}
-    });
-    EXTENDED.forEach(function(p){
-      var el=document.getElementById("field-"+p);
-      if(el){var v=el.value.trim();if(v)obj[p]=v;}
-    });
-    var dogEl=document.getElementById("field-dog");
-    if(dogEl&&dogEl.value.trim())obj.dog=dogEl.value.trim();
-    var pv=document.getElementById("field-pietrasanta");
-    if(pv&&pv.value.trim())obj.pietrasanta=pv.value.trim();
-  }
-  var bl=document.getElementById("field-boat_location");
-  var bu=document.getElementById("field-boat_use");
-  if(bl&&bl.value.trim())obj.boat_location=bl.value.trim();
-  if(bu&&bu.value.trim())obj.boat_use=bu.value.trim();
 
-  // Apply to all days in range
+  var allFieldKeys=PEOPLE.concat(EXTENDED).concat([
+    "boat_location","boat_use","dog","pietrasanta",
+    "cabin_master","cabin_armadio","cabin_multipurpose","cabin_matrimoniale","cabin_doppia"
+  ]);
+
+  var newFields={};
+  allFieldKeys.forEach(function(f){
+    var el=document.getElementById("field-"+f);
+    if(!el)return;
+    var current=el.value.trim();
+    var original=(openedDayData||{})[f]||"";
+    if(current&&current!==original) newFields[f]=current;
+  });
+
+  if(Object.keys(newFields).length===0){
+    alert("Type a new value in at least one field first, then apply.");
+    return;
+  }
+
   ALL_DAYS.forEach(function(d){
     if(d>=editingDay&&d<=until){
-      if(CAPTAIN_MODE){
-        var existing=Object.assign({},DATA[d]||{});
-        if(obj.boat_location)existing.boat_location=obj.boat_location;
-        else delete existing.boat_location;
-        if(obj.boat_use)existing.boat_use=obj.boat_use;
-        else delete existing.boat_use;
-        if(obj.dog)existing.dog=obj.dog;
-        else delete existing.dog;
-        DATA[d]=existing;
-      } else {
-        DATA[d]=Object.assign({},obj);
-      }
+      var existing=Object.assign({},DATA[d]||{});
+      Object.keys(newFields).forEach(function(f){existing[f]=newFields[f];});
+      DATA[d]=existing;
     }
   });
 
@@ -668,7 +656,6 @@ function applyRange(){
   closeModal();
   render();
 }
-
 init();
 </script>
 
