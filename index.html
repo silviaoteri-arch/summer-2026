@@ -122,6 +122,8 @@ transparent 6px
       <div id="extended-fields"></div>
       <div class="section-label" id="dog-section-label" style="margin-top:14px">🐶</div>
       <div id="dog-fields"></div>
+      <div class="section-label" id="cabins-section-label" style="margin-top:14px">🛏 Cabins</div>
+      <div id="cabins-fields"></div>
       <div class="section-label" id="pietrasanta-section-label" style="margin-top:14px">🏡 Pietrasanta</div>
       <div id="pietrasanta-fields"></div>
       <div style="margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
@@ -147,12 +149,20 @@ const PEOPLE = ["Fede","Ale","Mamy","Babu"];
 const EXTENDED = ["Nina","Martino"];
 const COLORS = {Fede:"#FF9800",Ale:"#1E88E5",Mamy:"#E91E63",Babu:"#43A047",Nina:"#8E24AA",Martino:"#00897B"};
 const ACTIVITY_COLORS = {
-  "WIMBLEDON":"#2E7D32","NADAL CAMP":"#C62828","VOLLEY CAMP":"#F9A825",
-  "SYDNEY?":"#E91E8C","GREECE":"#EF6C00",
+  "WIMBLEDON":"#2E7D32",
+  "NADAL CAMP":"#F9A825","VOLLEY CAMP":"#FDD835",
+  "SYDNEY?":"#9E9E9E","GREECE":"#EF6C00",
   "PENGUINS CANNES":"#29B6F6","PENGUINS CANNES?":"#29B6F6",
   "PENGUINS GREECE with Ricky":"#039BE5","PENGUINS GREECE with cousins":"#0288D1",
-  "RENTED":"#757575","FORMENTI":"#29B6F6","SAN LORENZO":"#757575",
-  "CANNES":"#1565C0","TRANSFER":"#546E7A","London":"#9E9E9E","Boat":"#29B6F6","Pietrasanta":"#7CB87C","Milan":"#757575"
+  "FORMENTI":"#29B6F6","Boat":"#29B6F6","BOAT":"#29B6F6",
+  "CANNES":"#1565C0","TRANSFER":"#546E7A",
+  "Pietrasanta":"#7CB87C","PIETRASANTA":"#7CB87C",
+  "RENTED":"#9E9E9E","SAN LORENZO":"#9E9E9E","San Lorenzo":"#9E9E9E",
+  "London":"#7986CB","LONDON":"#7986CB",
+  "Milan":"#78909C","MILAN":"#78909C",
+  "Away":"#26C6DA","Italy":"#66BB6A","Ecuador":"#FFA726",
+  "Torino":"#9E9E9E","Sydney":"#9E9E9E","SYDNEY":"#9E9E9E",
+  "Master":"#0277BD","Armadio":"#0288D1","Multi-purpose":"#039BE5","Matrimoniale":"#29B6F6","Doppia":"#4FC3F7"
 };
 const ALL_MONTHS = ["April","May","June","July","August","September","October","November","December","January 2027","February 2027","March 2027","April 2027","May 2027","June 2027","July 2027","August 2027"];
 const COL_W = 34, LABEL_W = 90, ROW_H = 34;
@@ -196,6 +206,7 @@ function actColor(val,field){
 var DATA={};
 var visibleMonths=new Set(ALL_MONTHS); // all always visible
 var editingDay=null;
+var openedDayData={};
 var saveTimer=null;
 var CAPTAIN_MODE=window.location.search.indexOf("captain")>=0;
 
@@ -307,6 +318,11 @@ function render(){
   rows.push({key:"boat_divider",label:"",field:"",color:""});
   rows.push({key:"boat_location",label:"🚢 Location",field:"boat_location",color:"#00ACC1"});
   rows.push({key:"boat_use",label:"🚢 Use",field:"boat_use",color:"#00838F"});
+  rows.push({key:"cabin_master",label:"Master",field:"cabin_master",color:"#0277BD"});
+  rows.push({key:"cabin_armadio",label:"Armadio",field:"cabin_armadio",color:"#0288D1"});
+  rows.push({key:"cabin_multipurpose",label:"Multi-purpose",field:"cabin_multipurpose",color:"#039BE5"});
+  rows.push({key:"cabin_matrimoniale",label:"Matrimoniale",field:"cabin_matrimoniale",color:"#29B6F6"});
+  rows.push({key:"cabin_doppia",label:"Doppia",field:"cabin_doppia",color:"#4FC3F7"});
   if(!CAPTAIN_MODE){
     rows.push({key:"pietrasanta_divider",label:"",field:"",color:""});
     rows.push({key:"pietrasanta",label:"🏡 Pietrasanta",field:"pietrasanta",color:"#43A047"});
@@ -473,6 +489,28 @@ function openModal(ds){
       +'<div class="field-label" style="color:#795548">Where</div>'
       +'<input class="field-input" id="field-dog" style="border:1.5px solid #795548" list="dl-person" placeholder="Where is the dog?" value="'+(dayData.dog||'')+'"></div>';
   }
+  var cabinFields=[
+    {key:"cabin_master",label:"Master",color:"#0277BD"},
+    {key:"cabin_armadio",label:"Armadio",color:"#0288D1"},
+    {key:"cabin_multipurpose",label:"Multi-purpose",color:"#039BE5"},
+    {key:"cabin_matrimoniale",label:"Matrimoniale",color:"#29B6F6"},
+    {key:"cabin_doppia",label:"Doppia",color:"#4FC3F7"}
+  ];
+  var cf=document.getElementById("cabins-fields");
+  if(cf){
+    cf.innerHTML="";
+    cabinFields.forEach(function(cab){
+      var row=document.createElement("div");
+      row.className="field-row";
+      row.innerHTML='<span style="font-size:12px">🛏</span>'
+        +'<div class="field-label" style="color:'+cab.color+';width:100px">'+cab.label+'</div>'
+        +'<input class="field-input" id="field-'+cab.key+'" style="border:1.5px solid '+cab.color+'" list="dl-person" placeholder="Who is in '+cab.label+'?" value="'+(dayData[cab.key]||'')+'"></div>';
+      cf.appendChild(row);
+    });
+  }
+  if(CAPTAIN_MODE&&cf)cf.style.display="none";
+  if(CAPTAIN_MODE&&document.getElementById("cabins-section-label"))
+    document.getElementById("cabins-section-label").style.display="none";
   var pff=document.getElementById("pietrasanta-fields");
   if(pff){
     var existingP=(DATA[ds]||{}).pietrasanta||"";
@@ -482,13 +520,14 @@ function openModal(ds){
       +'<input class="field-input" id="field-pietrasanta" style="border:1.5px solid #43A047" list="dl-person" placeholder="Who is staying?" value="'+existingP+'"></div>';
   }
   if(CAPTAIN_MODE){
-    ["extended-section-label","dog-section-label","pietrasanta-section-label"].forEach(function(id){
+    ["extended-section-label","dog-section-label","cabins-section-label","pietrasanta-section-label"].forEach(function(id){
       var el=document.getElementById(id);if(el)el.style.display="none";
     });
-    ["extended-fields","dog-fields","pietrasanta-fields"].forEach(function(id){
+    ["extended-fields","dog-fields","cabins-fields","pietrasanta-fields"].forEach(function(id){
       var el=document.getElementById(id);if(el)el.style.display="none";
     });
   }
+  openedDayData=Object.assign({},DATA[ds]||{});
   var applyUntilEl=document.getElementById("apply-until");
   if(applyUntilEl)applyUntilEl.value=ds;
   document.getElementById("modal-overlay").classList.add("open");
@@ -519,6 +558,17 @@ function saveDay(){
     if(bl)existing.boat_location=bl; else delete existing.boat_location;
     if(bu)existing.boat_use=bu; else delete existing.boat_use;
     DATA[editingDay]=existing;
+  }
+  var cabinKeys=["cabin_master","cabin_armadio","cabin_multipurpose","cabin_matrimoniale","cabin_doppia"];
+  if(!CAPTAIN_MODE){
+    cabinKeys.forEach(function(k){
+      var el=document.getElementById("field-"+k);
+      if(el){
+        var v=el.value.trim();
+        if(v)DATA[editingDay][k]=v;
+        else delete DATA[editingDay][k];
+      }
+    });
   }
   var pv=document.getElementById("field-pietrasanta");
   if(pv){
@@ -630,6 +680,11 @@ init();
   <option value="Away">
   <option value="Italy">
   <option value="Ecuador">
+  <option value="Master">
+  <option value="Armadio">
+  <option value="Multi-purpose">
+  <option value="Matrimoniale">
+  <option value="Doppia">
 </datalist>
 <datalist id="dl-boat-location">
   <option value="CANNES">
