@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -14,20 +13,23 @@ body::before{content:"";position:fixed;inset:0;background-image:url("data:image/
 
 .title{color:#fff;font-size:20px}
 
+
+
+
 #saving{color:#F5D98E;font-size:11px;display:none;margin-left:auto}
 #timeline-wrap{max-width:1300px;margin:0 auto;padding:24px 0 60px}
-#timeline-scroll{overflow-x:auto;padding-bottom:12px}
+#timeline-scroll{overflow-x:auto;overflow-y:auto;padding-bottom:12px;max-height:calc(100vh - 80px)}
 #timeline{position:relative;display:inline-flex;flex-direction:column;background:#e8f4fd}
-.month-header-row{display:flex;margin-left:90px}
+.month-header-row{display:flex;margin-left:0;position:sticky;top:0;z-index:20;background:#e8f4fd}
 .month-label-cell{flex-shrink:0;padding:4px 0 3px 8px;font-size:11px;font-weight:700;color:#1a6b9a;letter-spacing:2px;text-transform:uppercase;border-left:2px solid rgba(26,107,154,0.4)}
-.day-header-row{display:flex;margin-left:90px;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:4px;margin-bottom:8px}
+.day-header-row{display:flex;margin-left:0;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:4px;margin-bottom:8px;position:sticky;top:28px;z-index:20;background:#e8f4fd}
 .day-cell{width:34px;flex-shrink:0;text-align:center;cursor:pointer;padding-top:3px}
 .day-cell.month-start{border-left:2px solid rgba(26,107,154,0.3)}
 .dow-label{font-size:8px;color:rgba(0,0,0,0.35);margin-bottom:1px}
 .day-num{font-size:10px;color:rgba(0,0,0,0.5);line-height:17px;border-radius:3px}
 .day-cell.weekend .day-num{color:#8B5E00;font-weight:700;background:rgba(184,134,11,0.15);border-radius:3px}.day-cell.weekend{background:rgba(0,0,0,0.03)}
 .row-wrap{display:flex;align-items:center;margin-bottom:3px;height:34px}
-.row-label{width:90px;flex-shrink:0;padding-right:10px;text-align:right;font-size:12px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;position:sticky;left:0;z-index:10;background:#e8f4fd;height:34px;display:flex;align-items:center;justify-content:flex-end;color:#1a1a1a!important}
+.row-label{width:90px;flex-shrink:0;padding-right:10px;text-align:right;font-size:12px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;position:sticky;left:0;z-index:10;background:#e8f4fd;height:34px;display:flex;align-items:center;justify-content:flex-end;color:#1a1a1a!important;z-index:25}
 .track{position:relative;height:34px;flex-shrink:0}
 .block{position:absolute;top:3px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.3);pointer-events:none}
 .block span{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92%;text-align:center;letter-spacing:0.3px}
@@ -58,31 +60,30 @@ body::before{content:"";position:fixed;inset:0;background-image:url("data:image/
 .btn-save{padding:6px 16px;border-radius:6px;border:none;background:linear-gradient(135deg,#F5D98E,#E6C84A);color:#0d2333;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif}
 
 .penguin-bg {
-background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘28’ height=‘28’ viewBox=‘0 0 28 28’%3E%3Ctext y=‘20’ font-size=‘18’ opacity=‘0.25’%3E🐧%3C/text%3E%3C/svg%3E”);
-background-repeat: repeat;
-background-size: 28px 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Ctext y='20' font-size='18' opacity='0.25'%3E🐧%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 28px 28px;
 }
 
 .hatch-grey {
-background-image: repeating-linear-gradient(
--45deg,
-rgba(0,0,0,0.18) 0px,
-rgba(0,0,0,0.18) 2px,
-transparent 2px,
-transparent 7px
-);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0,0,0,0.18) 0px,
+    rgba(0,0,0,0.18) 2px,
+    transparent 2px,
+    transparent 7px
+  );
 }
 .hatch-color {
-background-image: repeating-linear-gradient(
--45deg,
-rgba(255,255,255,0.4) 0px,
-rgba(255,255,255,0.4) 2px,
-transparent 2px,
-transparent 6px
-);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255,255,255,0.4) 0px,
+    rgba(255,255,255,0.4) 2px,
+    transparent 2px,
+    transparent 6px
+  );
 }
 </style>
-
 </head>
 <body>
 
@@ -284,6 +285,10 @@ function render(){
   // Month header row
   var mhr=document.createElement("div");
   mhr.className="month-header-row";
+  // Sticky left spacer matching label width
+  var mhrSpacer=document.createElement("div");
+  mhrSpacer.style.cssText="width:90px;flex-shrink:0;position:sticky;left:0;z-index:30;background:#e8f4fd";
+  mhr.appendChild(mhrSpacer);
   boundaries.forEach(function(b,i){
     var nextIdx=i+1<boundaries.length?boundaries[i+1].idx:visibleDays.length;
     var cell=document.createElement("div");
@@ -297,6 +302,10 @@ function render(){
   // Day header row
   var dhr=document.createElement("div");
   dhr.className="day-header-row";
+  // Sticky left spacer
+  var dhrSpacer=document.createElement("div");
+  dhrSpacer.style.cssText="width:90px;flex-shrink:0;position:sticky;left:0;z-index:30;background:#e8f4fd";
+  dhr.appendChild(dhrSpacer);
   visibleDays.forEach(function(ds){
     var cell=document.createElement("div");
     cell.className="day-cell"+(isWeekend(ds)?" weekend":"")+(dayN(ds)===1?" month-start":"");
